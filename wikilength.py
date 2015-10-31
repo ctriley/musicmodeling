@@ -10,12 +10,12 @@ with open('data.csv', 'rb') as f:
 	songlist = list(reader)
 # regular expression needs generalizing for other songs
 # need to output result into csv
-expr = re.compile('class="duration"><span class="min">(\d)*</span>:<span class="s">(\d)+')
+expr = re.compile('class="min">(\d)*</span>:<span class="s">(\d)+')
 for line in songlist:
 	#pagetitle = wikipedia.suggest(line[1] + " music")
 	#if(pagetitle != None):
 	try:
-		test = wikipedia.page("Hotline Bling") # replace "hotline bling" with line[1]
+		test = wikipedia.page("hotline bling") # replace "hotline bling" with line[1]
 		s = test.html()
 		search = expr.search(s)
 		print search
@@ -23,7 +23,8 @@ for line in songlist:
 			span = search.span()
 			(x,y) = span
 			sub = s[x:y]
-			print sub
+			length = len(sub)
+			
 	except wikipedia.exceptions.PageError:
 		print "page not found"
 			# do nothing
