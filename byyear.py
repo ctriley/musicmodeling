@@ -1,42 +1,23 @@
+#byyear2.py
+
+import urllib2
 import re
 import csv
 import wikipedia
-import requests
-from BeautifulSoup import BeautifulSoup
+import ssl
+import urllib
 
-def getURL(page):
-    """
-
-    :param page: html of web page (here: Python home page) 
-    :return: urls in that page 
-    """
-    start_link = page.find("a href")
-    if start_link == -1:
-        return None, 0
-    start_quote = page.find('"', start_link)
-    end_quote = page.find('"', start_quote + 1)
-    url = page[start_quote + 1: end_quote]
-    print url
-    return url, end_quote
 
 def getURLList(startURL):
-	urlList = []
-	response = requests.get(startURL)
-	# parse html
+	context = ssl._create_unverified_context()
+	website = urllib.urlopen(startURL, context=context)
 	print startURL
-	print response
-	page = str(BeautifulSoup(response.content))
-	print page
-	while True:
-		url, n = getURL(page)
-    	print url
-    	page = page[n:]
-    	if url:
-    		urlList.append(url)
-    	else:
-    		print "did nothing"
-    		return urlList
-
+	#website = urllib2.urlopen(startURL)
+	#read html code
+	html = website.read()
+	#use re.findall to get all the links
+	links = re.findall('"((http|ftp)s?://.*?)"', html)
+	print links
 
 with open('data.csv', 'rb') as f:
 	reader = csv.reader(f)
@@ -64,23 +45,3 @@ for i in range(0, endRange):
 	for songpage in wikipage.links:
 		print songpage
 		print songname
-
-# needs fixing
-# have list of urls, have list of songs
-# from url, get title, check against list of songs
-# if match, parse page for song length
-#for i from 0 to endRange:
-#	songname = songlist[i][1]
-#	for songpage in wikipage.links:
-#		print songpage
-#		print songname
-#		if(songpage == songname):
-#			url = songpage.geturl()			# need to figure out how to get the url for each page
-#			print url
-#			resp = requests.get(url, params={'action': 'raw'})
-#			page = resp.text
-#			for line in page.splitlines():
-#				if line.startswith('| Length'):
-#					length = line.partition('=')[-1].strip()
-#					break
-#			print length
