@@ -17,7 +17,7 @@ def getURLList(startURL):
 	html = website.read()
 	#use re.findall to get all the links
 	links = re.findall('"((http|ftp)s?://.*?)"', html)
-	print links
+	return links
 
 with open('data.csv', 'rb') as f:
 	reader = csv.reader(f)
@@ -35,13 +35,13 @@ for i in range(1980, 2010):
 
 wikipage = wikipedia.page(beginpage)
 starturl = wikipage.url
-getURLList(starturl)
+links = getURLList(starturl)
 
 startRange = yearmap[year]
 endRange = startRange + 100
 
 for i in range(0, endRange):
 	songname = songlist[i][1]
-	for songpage in wikipage.links:
+	for songpage in links:
 		print songpage
 		print songname
