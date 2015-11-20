@@ -1,0 +1,4 @@
+Possible source of errors/biases in our data
+
+-To get our data, we wrote a python script to go to the wikipedia pages for each song that charted in the
+Billboard top 100 at the end of each year and extracted the length from that html page. However, some of the songs that charted had multiple parts (e.g. Another Brick in the Wall, which has three parts even though only part 2 charted). Whenthe script reached a page for such a song, it grabbed then length of all of the parts combined. There was no trivial way to extract the length of only the part that charted, so this introduced some error into our data.
