@@ -31,42 +31,81 @@ def getTableURLS(beginpage):
 		actuallinks.append(actuallink)
 	return actuallinks
 
-def getSongLengths(links):
+def getSongInfo(beginpage):
 	context = ssl._create_unverified_context()
+	wikipage = wikipedia.page(beginpage)
+	starturl = wikipage.url
+	print starturl
+	website = urllib.urlopen(starturl, context=context)
+	html = website.read()
+	table_entries = re.findall('<tr>\n<td>\d+</td>\n<td>"<a href="/wiki/.*" title.*\n<td><a href=".*" title', html)
+	ranklist = {}
+	for entry in table_entries:
+		rank = re.findall("<td>\d+</td>", entry)
+		rank = rank[0][4:-5]
+		linkprefix = "https://www.wikipedia.org"
+		link = re.findall('<td>"<a href="/wiki/.*" title', entry)
+		actuallink = linkprefix + link[0][14:-7]
+		artistname = entry.split("\n")
+		artistname = artistname[3]
+		artistname = artistname[19:-7]
+		row = [actuallink, artistname]
+		ranklist[rank] = row
+	return ranklist
+
+
+def getSongLengths(links, year):
+	context = ssl._create_unverified_context()
+	lenghtexpr = re.compile('<th scope="row">Length</th>\n<td>[<b>]*\d*:\d\d')
+	timeexpr = re.compile('\d*:\d\d')
+	songnamexpr = re.compile('<title>.* -')
 	songdictionary = {}
-	for link in links:
+	for key in links:
+		row = links[key]
+		link = row[0]
 		website = urllib.urlopen(link, context=context)
 		html = website.read()
-		a = re.findall(lenghtexpr, html)
-		if(len(a) > 0):
-			songlength = re.findall(timeexpr, a[0])
-			songdictionary[link] = songlength[0]
-			print songdictionary[link]
-	print len(songdictionary)
+		lengthregx = re.findall(lenghtexpr, html)
+		titles = re.findall(songnamexpr, html)
+		title = titles[0][7:-2]
+		if(len(lengthregx) > 0):
+			songlength = re.findall(timeexpr, lengthregx[0])
+			entry = [title, row[1], year, songlength[0]]
+			songdictionary[key] = entry
 	return songdictionary
-with open('data.csv', 'rb') as f:
-	reader = csv.reader(f)
-	songlist = list(reader)
-
-lenghtexpr = re.compile('<th scope="row">Length</th>\n<td>[<b>]*\d*:\d\d')
-timeexpr = re.compile('\d*:\d\d')
-year = "1980"
-beginpage = "Billboard Year-End Hot 100 singles of " + str(year)
-yearmap = {}
-j = 0;
-for i in range(1980, 2010):
-	yearmap[str(i)] = j
-	j = j + 100
-
-startRange = yearmap[year]
-endRange = startRange + 100
-links = getTableURLS(beginpage)
-songdictionary = getSongLengths(links)
 
 
-for i in range(startRange, endRange):
-	songname = songlist[i][1]
-	for songpage in links:
-		x  = 1
-		#print songpage
-		#print songname
+def writeyear(year):
+	beginpage = "Billboard Year-End Hot 100 singles of " + str(year)
+	ranklist = getSongInfo(beginpage)
+	songdictionary = getSongLengths(ranklist, year)
+
+	with open('out.csv', 'a') as out: # 'a' opens the file for appending 'w' for overwriting
+		writer = csv.writer(out)
+		for key in songdictionary:
+			dictionaryrow = songdictionary[key]
+			csvrow = [key, dictionaryrow[0], dictionaryrow[1], dictionaryrow[2], dictionaryrow[3]]
+			writer.writerow(csvrow)
+
+def main():
+	for year in range(1982,1983):
+		print str(year)
+		writeyear(year)
+
+if __name__ == "__main__": 
+	main()
+
+
+#with open('data.csv', 'rb') as f:
+#	reader = csv.reader(f)
+#	songlist = list(reader)
+#yearmap = {}
+	#j = 0;
+
+	#for i in range(1980, 2010):
+	#	yearmap[str(i)] = j
+	#	j = j + 100
+
+	#startRange = yearmap[year]
+	#endRange = startRange + 100
+	#links = getTableURLS(beginpage)
