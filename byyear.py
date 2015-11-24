@@ -6,6 +6,7 @@ import csv
 import wikipedia
 import ssl
 import urllib
+import sys
 
 
 def getURLList(startURL):
@@ -35,8 +36,8 @@ def getSongInfo(beginpage):
 	context = ssl._create_unverified_context()
 	wikipage = wikipedia.page(beginpage)
 	starturl = wikipage.url
-	#print starturl
 	website = urllib.urlopen(starturl, context=context)
+	#website = urllib.urlopen(starturl, context=context)
 	html = website.read()
 	table_entries = re.findall('<tr>\n<th scope="row">\d+</th>\n<td>"<a href="/wiki/.*" title.*\n<td><a href=".*" title', html)
 	ranklist = {}
@@ -45,7 +46,7 @@ def getSongInfo(beginpage):
 		rank = rank[0][16:-5]
 		linkprefix = "https://www.wikipedia.org"
 		link = re.findall('<td>"<a href="/wiki/.*" title', entry)
-		actuallink = linkprefix + link[0][14:-8]
+		actuallink = linkprefix + link[0][14:-7]
 		artistname = entry.split("\n")
 		artistname = artistname[3]
 		artistname = artistname[19:-7]
@@ -58,16 +59,16 @@ def getSongLengths(links, year):
 	context = ssl._create_unverified_context()
 	lenghtexpr = re.compile('<th scope="row">Length</th>\n<td>[<b>]*\d*:\d\d')
 	timeexpr = re.compile('\d*:\d\d')
-	songnamexpr = re.compile('<title>.*</title>')
+	songnamexpr = re.compile('<title>.* - Wikipedia, the free encyclopedia</title>')
 	songdictionary = {}
 	for key in links:
 		row = links[key]
 		link = row[0]
-		website = urllib.urlopen(link, context=context)
-		html = website.read()
+		website = urllib2.urlopen(link, context=context)
+		html = website.read().decode("utf-8")
 		lengthregx = re.findall(lenghtexpr, html)
-		titles = re.findall(songnamexpr, html)
-		print titles	# last letter of song gets cut off
+		titles = re.findall('<title>.* - Wikipedia, the free encyclopedia</title>', html)
+		print titles	# correct now
 		title = titles[0][7:-2]
 		if(len(lengthregx) > 0):
 			songlength = re.findall(timeexpr, lengthregx[0])
@@ -86,7 +87,7 @@ def writeyear(year):
 		for key in songdictionary:
 			dictionaryrow = songdictionary[key]
 			csvrow = [key, dictionaryrow[0], dictionaryrow[1], dictionaryrow[2], dictionaryrow[3]]
-			writer.writerow(csvrow)
+			#writer.writerow(csvrow)
 
 def main():
 	for year in range(1982,1983):
