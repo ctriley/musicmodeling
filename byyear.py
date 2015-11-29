@@ -2,7 +2,7 @@
 
 import urllib2
 import re
-import csv
+import unicodecsv as csv
 import wikipedia
 import ssl
 import urllib
@@ -68,8 +68,7 @@ def getSongLengths(links, year):
 		html = website.read().decode("utf-8")
 		lengthregx = re.findall(lenghtexpr, html)
 		titles = re.findall('<title>.* - Wikipedia, the free encyclopedia</title>', html)
-		print titles	# correct now
-		title = titles[0][7:-2]
+		title = titles[0][7:-43]
 		if(len(lengthregx) > 0):
 			songlength = re.findall(timeexpr, lengthregx[0])
 			entry = [title, row[1], year, songlength[0]]
@@ -81,16 +80,16 @@ def writeyear(year):
 	beginpage = "Billboard Year-End Hot 100 singles of " + str(year)
 	ranklist = getSongInfo(beginpage)
 	songdictionary = getSongLengths(ranklist, year)
-
-	with open('out.csv', 'a') as out: # 'a' opens the file for appending 'w' for overwriting
+	#print songdictionary
+	with open('out.csv', 'wb') as out: # 'a' opens the file for appending 'w' for overwriting
 		writer = csv.writer(out)
 		for key in songdictionary:
 			dictionaryrow = songdictionary[key]
 			csvrow = [key, dictionaryrow[0], dictionaryrow[1], dictionaryrow[2], dictionaryrow[3]]
-			#writer.writerow(csvrow)
+			writer.writerow(csvrow)
 
 def main():
-	for year in range(1982,1983):
+	for year in range(1982,2015):
 		print str(year)
 		writeyear(year)
 
