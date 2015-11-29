@@ -64,15 +64,19 @@ def getSongLengths(links, year):
 	for key in links:
 		row = links[key]
 		link = row[0]
-		website = urllib2.urlopen(link, context=context)
-		html = website.read().decode("utf-8")
-		lengthregx = re.findall(lenghtexpr, html)
-		titles = re.findall('<title>.* - Wikipedia, the free encyclopedia</title>', html)
-		title = titles[0][7:-43]
-		if(len(lengthregx) > 0):
-			songlength = re.findall(timeexpr, lengthregx[0])
-			entry = [title, row[1], year, songlength[0]]
-			songdictionary[key] = entry
+		print link
+		try:
+			website = urllib2.urlopen(link, context=context)	# fails here
+			html = website.read().decode("utf-8")
+			lengthregx = re.findall(lenghtexpr, html)
+			titles = re.findall('<title>.* - Wikipedia, the free encyclopedia</title>', html)
+			title = titles[0][7:-43]
+			if(len(lengthregx) > 0):
+				songlength = re.findall(timeexpr, lengthregx[0])
+				entry = [title, row[1], year, songlength[0]]
+				songdictionary[key] = entry
+		except:
+			"encountered exception"
 	return songdictionary
 
 
@@ -81,7 +85,7 @@ def writeyear(year):
 	ranklist = getSongInfo(beginpage)
 	songdictionary = getSongLengths(ranklist, year)
 	#print songdictionary
-	with open('out.csv', 'wb') as out: # 'a' opens the file for appending 'w' for overwriting
+	with open('out5.csv', 'a') as out: # 'a' opens the file for appending 'w' for overwriting
 		writer = csv.writer(out)
 		for key in songdictionary:
 			dictionaryrow = songdictionary[key]
