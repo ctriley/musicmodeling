@@ -48,6 +48,18 @@ def leastsquares(x,y):
 	clf.fit(x,y)
 	print('Coefficients: \n', clf.coef_)
 
+def ridgeregression(x,y):
+	clf = linear_model.Ridge(alphas = [.1,.5,1,10])
+	clf.fit(x,y)
+	print clf.alpha_
+
+def lasso(x,y):
+	clf = linear_model.Lasso(alphas = [.1,.5,1,10])
+	clf.fit(x,y)
+	print clf.alpha_
+
+
+
 def main():
 	(x,y) = readdata()
 	leastsquares(x,y)
