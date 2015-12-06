@@ -64,7 +64,7 @@ def readdata2014():
 					x.append([titlelength, length])
 		return (x,y)
 
-def scatterplot(x, y):
+def show_scatterplot(x, y):
         title = []
         time = []
         for i in range(len(x)):
@@ -75,41 +75,56 @@ def scatterplot(x, y):
         plt.scatter(time, y)
         plt.show()
 
+def order_predicted_values(ypredict):
+        yordered = []
+        ypredict_sorted = sorted(ypredict)
+        for i in range(len(ypredict)):
+                for j in range(len(ypredict_sorted)):
+                        if (ypredict[i] == ypredict_sorted[j]) and (j not in yordered):
+                                yordered.append(j)
+        return yordered
+        
 def rsquared(regressiontype, ypredict, y1):
-	print regressiontype
-	print ypredict  # what do these values represent?
-	metrics.r2_score(y1, ypredict)
+	print regressiontype, metrics.r2_score(y1, ypredict)
 	
 
 def leastsquares(x,y, x1, y1):
 	clf = linear_model.LinearRegression()
 	clf.fit(x,y)
 	ypredict = clf.predict(x1)
+	yordered = order_predicted_values(ypredict)
 	rsquared("least squares",ypredict, y1)
+	rsquared("least squares ordered",yordered, y1)
 
 def ridgeregression(x,y,x1,y1):
 	clf = linear_model.RidgeCV(alphas=[.1,.5,1,10])
 	clf.fit(x,y)
 	ypredict = clf.predict(x1)
+	yordered = order_predicted_values(ypredict)
 	rsquared("ridgeregression",ypredict, y1)
+	rsquared("ridgeregression ordered:",yordered, y1)
 
 def lasso(x,y,x1,y1):
 	clf = linear_model.LassoCV(alphas=[.1,.5,1,10])
 	clf.fit(x,y)
 	ypredict = clf.predict(x1)
+	yordered = order_predicted_values(ypredict)
 	rsquared("lasso",ypredict, y1)
+	rsquared("lasso ordered", yordered, y1)
 
 def logistic(x,y,x1,y1):
         clf = linear_model.LogisticRegression()
         clf.fit(x,y)
         ypredict = clf.predict(x1)
+        yordered = order_predicted_values(ypredict)
         rsquared("logistic", ypredict, y1)
+        rsquared("logistic ordered", yordered, y1)
 
 def main():
 	(x,y) = readdata()
 	(x1, y1) = readdata2014()
-	scatterplot(x,y)
-	#scatterplot(x1,y1)
+	# show_scatterplot(x,y)
+	# show_scatterplot(x1,y1)
 	leastsquares(x,y,x1,y1)
 	ridgeregression(x,y,x1,y1)
 	lasso(x,y,x1,y1)
