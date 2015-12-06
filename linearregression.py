@@ -66,8 +66,8 @@ def readdata2014():
 
 def rsquared(regressiontype, ypredict, y1):
 	print regressiontype
-	metrics.r2_score(y1, ypredict)
-	
+	score = metrics.r2_score(y1, ypredict)
+	print score
 
 def leastsquares(x,y, x1, y1):
 	clf = linear_model.LinearRegression()
@@ -76,13 +76,13 @@ def leastsquares(x,y, x1, y1):
 	rsquared("least squares",ypredict, y1)
 
 def ridgeregression(x,y,x1,y1):
-	clf = linear_model.Ridge(alpha=[.1,.5,1,10])
+	clf = linear_model.RidgeCV(alphas=[.1,.5,1,10])
 	clf.fit(x,y)
 	ypredict = clf.predict(x1)
 	rsquared("ridgeregression",ypredict, y1)
 
 def lasso(x,y,x1,y1):
-	clf = linear_model.Lasso(alpha=[.1,.5,1,10])
+	clf = linear_model.LassoCV(alphas=[.1,.5,1,10])
 	clf.fit(x,y)
 	ypredict = clf.predict(x1)
 	rsquared("lasso",ypredict, y1)
@@ -97,8 +97,8 @@ def main():
 	(x,y) = readdata()
 	(x1, y1) = readdata2014()
 	leastsquares(x,y,x1,y1)
-	# ridgeregression(x,y,x1,y1)
-	# lasso(x,y,x1,y1)
+	ridgeregression(x,y,x1,y1)
+	lasso(x,y,x1,y1)
 	logistic(x,y,x1,y1)
 
 
