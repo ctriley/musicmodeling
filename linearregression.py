@@ -2,6 +2,7 @@ import csv
 import datetime
 import time
 from sklearn import linear_model # pip install -U scikit-learn
+from sklearn import metrics
 
 
 def gettitlelength(title):
@@ -65,7 +66,7 @@ def readdata2014():
 
 def rsquared(regressiontype, ypredict, y1):
 	print regressiontype
-	sklearn.metrics.r2_score(y1, ypredict)
+	metrics.r2_score(y1, ypredict)
 	
 
 def leastsquares(x,y, x1, y1):
@@ -75,23 +76,30 @@ def leastsquares(x,y, x1, y1):
 	rsquared("least squares",ypredict, y1)
 
 def ridgeregression(x,y,x1,y1):
-	clf = linear_model.Ridge(alphas = [.1,.5,1,10])
+	clf = linear_model.Ridge(alpha=[.1,.5,1,10])
 	clf.fit(x,y)
 	ypredict = clf.predict(x1)
 	rsquared("ridgeregression",ypredict, y1)
 
 def lasso(x,y,x1,y1):
-	clf = linear_model.Lasso(alphas = [.1,.5,1,10])
+	clf = linear_model.Lasso(alpha=[.1,.5,1,10])
 	clf.fit(x,y)
 	ypredict = clf.predict(x1)
 	rsquared("lasso",ypredict, y1)
+
+def logistic(x,y,x1,y1):
+        clf = linear_model.LogisticRegression()
+        clf.fit(x,y)
+        ypredict = clf.predict(x1)
+        rsquared("logistic", ypredict, y1)
 
 def main():
 	(x,y) = readdata()
 	(x1, y1) = readdata2014()
 	leastsquares(x,y,x1,y1)
-	ridgeregression(x,y,x1,y1)
-	lasso(x,y,x1,y1)
+	# ridgeregression(x,y,x1,y1)
+	# lasso(x,y,x1,y1)
+	logistic(x,y,x1,y1)
 
 
 if __name__ == "__main__": 
