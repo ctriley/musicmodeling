@@ -1,6 +1,7 @@
 import csv
 import datetime
 import time
+import matplotlib.pyplot as plt
 from sklearn import linear_model # pip install -U scikit-learn
 from sklearn import metrics
 
@@ -63,9 +64,20 @@ def readdata2014():
 					x.append([titlelength, length])
 		return (x,y)
 
+def scatterplot(x, y):
+        title = []
+        time = []
+        for i in range(len(x)):
+                title.append(x[i][0])
+                time.append(x[i][1])
+        plt.scatter(title, y)
+        plt.show()
+        plt.scatter(time, y)
+        plt.show()
 
 def rsquared(regressiontype, ypredict, y1):
 	print regressiontype
+	print ypredict  # what do these values represent?
 	metrics.r2_score(y1, ypredict)
 	
 
@@ -96,6 +108,8 @@ def logistic(x,y,x1,y1):
 def main():
 	(x,y) = readdata()
 	(x1, y1) = readdata2014()
+	scatterplot(x,y)
+	#scatterplot(x1,y1)
 	leastsquares(x,y,x1,y1)
 	# ridgeregression(x,y,x1,y1)
 	# lasso(x,y,x1,y1)
